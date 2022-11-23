@@ -1,0 +1,131 @@
+syntax = "proto2";
+
+package ams.exp.market_simulation;
+
+option java_outer_classname = "MarketSimulationConfigProtos";
+
+message BaseParam {
+  optional string test_name = 1 [default =  "test0"];
+  optional bool create_new_test = 2 [default = true];
+  optional string base_hdfs_path = 3 [default = "hdfs://ss-cdg-13-v2/data/SPARK/CDG/g_sng_gdt_g_sng_gdt_isd_experiment/market_simulation/market_simulation_streaming"];
+  optional int32 batch_duration = 4 [default = 2];
+  // 模拟基础参数
+  optional int64 user_cnt = 5 [default = 10000];
+  optional int64 ad_cnt = 6 [default = 10000];
+  optional int64 req_cnt = 7 [default = 10000];
+  optional int32 record_cnt_per_partition = 8 [default = 1000];
+  optional int32 req_cnt_per_batch = 9 [default = 1000];
+  optional int64 random_seed = 10;
+  optional bool print_detail = 11;
+  optional int32 repartition_num = 12 [default = 10];
+  optional int32 output_partition_num = 13 [default = 10];
+  optional string output_db_name = 14 [default = "hlw_gdt"];
+  optional string output_tbl_name = 15 [default = "market_simulation_test"];
+  optional string partition_date = 16 [default = "20210820"];
+  optional int32 batch_num_per_day = 17 [default = 10];
+  optional bool rm_checkpoint = 18;
+  optional int64 ad_random_seed = 19;
+  optional int64 copy_ad_cnt = 20;
+}
+
+message AdStrategyParam {
+  optional double kp = 1 [default = 0.5];
+  optional double ki = 2 [default = 0.1];
+  optional double kd = 3 [default = 0.2];
+  optional double adjust_factor_max = 4 [default = 2];
+  optional double adjust_factor_min = 5 [default = 0.5];
+}
+
+message DisplayParam {
+  enum ExpType {
+    EXP_TYPE_UNKNOWN = 0;
+    EXP_TYPE_USER_AB_TEST = 1;
+    EXP_TYPE_AD_AB_TEST = 2;
+    EXP_TYPE_AD_FLOW_JOINT_TEST = 3;
+    EXP_TYPE_SPLIT_UPLIFT_TEST = 4;
+    EXP_TYPE_AD_SUPPORT_TEST = 5;
+    EXP_TYPE_UPLIFT_TEST = 6;
+    EXP_TYPE_AD_SUPPORT_USER_AB_TEST = 7;
+    EXP_TYPE_AD_SPLIT_TEST = 8;
+  }
+  optional ExpType exp_type = 1;
+  optional bool use_ecpm_ranking = 2 [default = true, deprecated = true];
+  // 两阶段竞价相关
+  optional int32 track_log_ad_taken_num = 3 [default = 100];
+  optional bool use_two_step_ranking = 4;
+  optional int32 in_reranking_ad_num = 5 [default = 100];
+  // 新广告隔离相关
+  optional bool use_new_ad_split = 6;
+  optional int32 new_ad_conv_threshold = 7 [default = 6];
+  optional double new_ad_split_ratio = 8 [default = 0.2];
+  optional bool use_targeting_logic = 9;
+  optional bool use_budget_logic = 10;
+  optional bool use_split_uplift_test = 11;
+  optional int32 split_uplift_test_ad_exp_num = 12 [default = 10, deprecated = true];
+  optional bool use_ad_support = 13;
+  optional bool use_uplift_test = 14;
+  optional int32 split_uplift_test_holdout_range = 15 [default = 1];
+  optional bool use_split_uplift_test_v2 = 16;
+  optional bool use_gsp_cost = 17 [default = true];
+  optional bool use_adjust_factor = 18 [default = true];
+  optional int32 ad_exp_num = 19 [default = 10];
+  optional bool use_ad_copy_split = 20;
+  optional int32 base_ad_range = 21;
+}
+
+message PredictModelParam {
+  optional double epsilon_min = 1 [default = -0.1];
+  optional double epsilon_max = 2 [default = 0.1];
+  optional double base_cvr_bias = 3;
+  optional double cvr_bias_lift = 4;
+  // LR预测模型相关
+  optional bool use_rank_lr_model = 5 [default = true];
+  optional bool use_rerank_lr_model = 6 [default = true];
+  optional int32 rank_model_feature_num = 9 [default = 3];
+  optional int32 rerank_model_feature_num = 10 [default = 4];
+  optional double prd_cvr_adjust_coef = 11 [default = 1.0];
+  optional bool use_interactions = 12;
+  optional string adjust_prd_cvr_weight_list = 13 [default = "1.0,0.0,0.0"];
+}
+
+message EffectParam {
+  optional double base_real_cvr = 1 [default = 0.1];
+  optional string real_cvr_user_coef_list = 2 [default =  "0.01,0.01,0.01,0.01,0.01"];
+  optional string real_cvr_ad_coef_list = 3 [default =  "0.01,0.01,0.01,0.01,0.01"];
+  optional double real_cvr_lift = 4;
+}
+
+message AdBehaviourParam {
+  // 广告主行为模拟相关
+  optional bool use_ad_behaviour = 1;
+  optional bool create_new_ad = 2;
+  optional int32 ad_pause_min_conversion = 3 [default = 10];
+  optional double ad_pause_min_over_ratio = 4 [default = 0.2];
+  optional double ad_pause_max_over_ratio = 5 [default = 1.0];
+  optional bool use_ad_feature_change = 6;
+  optional int32 ad_feature_change_round_no = 7;
+  optional int32 ad_feature_change_range = 8;
+}
+
+message ElementParam {
+  optional int32 target_cpa_max = 1 [default = 100];
+  optional int32 target_cpa_min = 2 [default = 90];
+  optional double target_cpa_const = 3 [default = 100.0];
+  optional int32 real_user_feature_num = 4 [default = 5];
+  optional int32 real_ad_feature_num = 5 [default = 5];
+  optional int32 targeting_num = 6 [default = 5];
+  optional int32 budget_power_min = 7 [default = 2];
+  optional int32 budget_power_max = 8 [default = 7];
+  optional bool diff_target_cpa = 9;
+  optional double diff_target_cpa_coef = 10;
+}
+
+message ParamInfo {
+  optional BaseParam base_param = 1;
+  optional AdStrategyParam ad_strategy_param = 2;
+  optional DisplayParam display_param = 3;
+  optional PredictModelParam predict_model_param = 4;
+  optional EffectParam effect_param = 5;
+  optional AdBehaviourParam ad_behaviour_param = 6;
+  optional ElementParam element_param = 7;
+}

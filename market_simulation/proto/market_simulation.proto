@@ -1,0 +1,89 @@
+syntax = "proto2";
+
+package ams.exp.market_simulation;
+
+option java_outer_classname = "MarketSimulationProtos";
+
+message ExpInfo {
+  optional int32 exp_id = 1;
+  repeated int32 param_value = 2 [packed=true];
+}
+
+message Metrics {
+  optional int64 impression = 1;
+  optional int64 click = 2;
+  optional int64 conversion = 3;
+  optional double cost = 4;
+  optional double gmv = 5;
+}
+
+// 广告信息
+message AdCurrentInfo {
+  enum AdRunningStatus {
+    RUNNING = 0;
+    PAUSE = 1;
+    STOP = 2;
+  }
+  // 广告特征
+  message AdFeatures {
+    optional double target_cpa = 1;
+    optional double adjust_factor = 2;
+    repeated double cpm_bias_list = 3 [packed=true];
+    repeated double ad_feature = 4 [packed=true];
+    optional bool is_new_ad = 5;
+    repeated int32 ad_targeting = 6 [packed=true];
+    optional double total_budget = 7;
+    optional double remain_budget = 8;
+  }
+  message AdScoreInfo {
+    optional double real_cvr = 1;
+    optional double cvr_bias = 2;
+    optional double epsilon = 3;
+    optional double prd_cvr = 4;
+    optional double ecpm = 5;
+    optional double ranking_ecpm = 6;
+  }
+  optional int64 ad_id = 1;
+  optional int64 advertiser_id = 2;
+  optional AdFeatures features = 3;
+  // 广告指标
+  optional Metrics metrics = 4;
+  optional AdScoreInfo ad_score_info = 5;
+  repeated ExpInfo exp_info = 6;
+  optional AdRunningStatus ad_running_status = 7;
+}
+
+// 用户信息
+message UserCurrentInfo {
+  // 用户特征
+  message UserFeatures {
+    repeated double user_feature = 1 [packed=true];
+    repeated int32 user_targeting = 2 [packed=true];
+  }
+  optional int64 user_id = 1;
+  optional UserFeatures features = 2;
+  // 用户指标
+  optional Metrics metrics = 3;
+  repeated ExpInfo exp_info = 4;
+}
+
+message RequestInfo {
+  optional int64 request_id = 1;
+  optional UserCurrentInfo user_current_info = 2;
+  repeated AdCurrentInfo ranking_ad_info = 3;
+  repeated AdCurrentInfo reranking_ad_info = 4;
+  optional Metrics metrics = 5;
+  optional int64 request_time = 6;
+  optional int32 win_ad_index = 7;
+  optional int32 trigger_value = 8;
+}
+
+message ModelInfo {
+  message LRModel {
+    optional double intercept = 1;
+    repeated double user_coef = 2 [packed=true];
+    repeated double ad_coef = 3 [packed=true];
+  }
+  optional LRModel rank_model = 1;
+  optional LRModel rerank_model = 2;
+}
