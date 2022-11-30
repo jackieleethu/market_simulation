@@ -4,7 +4,7 @@
 广告投放系统可以视为广告供给侧和用户需求侧构成的一种双边市场。为了量化双边市场中各种要素对市场供需的影响，并探索如何最大化双边市场的收益，我们希望通过模拟的方式来对双边市场进行分析和研究。
 
 ## 设计文档
-https://docs.qq.com/doc/DUFZSZHJrb2VJeWNL
+https://doc.weixin.qq.com/doc/w3_ACAAkQaDACc2RuJVh7qQ2iyi5lobz?scode=AJEAIQdfAAocKyCK3QACAAkQaDACc
 
 ## 文件说明
 ### MarketSimulationStreamingMain.scala
